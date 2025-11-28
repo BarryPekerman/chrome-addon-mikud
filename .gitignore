@@ -1,0 +1,75 @@
+# Whitelist approach: Ignore everything, then unignore required files
+
+# Ignore everything
+*
+
+# Unignore required extension files
+!manifest.json
+!popup.html
+!popup.js
+!popup.css
+!options.html
+!options.js
+!background.js
+
+# Unignore utility files
+!utils/
+!utils/*.js
+
+# Unignore icons
+!icons/
+!icons/*.png
+!icons/README.md
+
+# Unignore documentation
+!README.md
+!LICENSE
+!PRIVACY_POLICY.md
+!CHROME_STORE_COMPLIANCE.md
+!CODEBASE_ANALYSIS.md
+!ISSUES_AND_ROADMAP.md
+
+# Unignore privacy policy HTML (for GitHub Pages)
+!docs/
+!docs/*.html
+
+# Unignore tests directory (for development)
+!tests/
+!tests/*.py
+!tests/*.sh
+!tests/*.txt
+!tests/README.md
+
+# Unignore .gitignore itself
+!.gitignore
+
+# Explicitly ignore common unwanted files/directories
+node_modules/
+tmp/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Ignore test artifacts
+tests/test_results.json
+tests/valid_addresses.json
+tests/error_screenshot.png
+tests/*.png
+
+# Ignore package files (not needed for Chrome extension runtime)
+package.json
+package-lock.json
