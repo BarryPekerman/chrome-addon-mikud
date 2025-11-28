@@ -121,7 +121,7 @@ chrome-addon-mikud/
 │   ├── validation.js     # Input validation
 │   └── storage.js        # Storage management
 ├── icons/                 # Extension icons
-└── AGENTS.md             # Development documentation
+└── tests/                 # Test scripts
 ```
 
 ## Development Status
