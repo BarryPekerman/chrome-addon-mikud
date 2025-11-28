@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mikud - חיפוש מיקוד</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>מיקוד - חיפוש מיקוד ישראלי</h1>
+    </header>
+    
+    <main>
+      <form id="searchForm">
+        <div class="form-group">
+          <label for="city">עיר:</label>
+          <input type="text" id="city" name="city" placeholder="הכנס שם עיר" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="street">רחוב:</label>
+          <input type="text" id="street" name="street" placeholder="הכנס שם רחוב" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="houseNumber">מספר בית:</label>
+          <input type="text" id="houseNumber" name="houseNumber" placeholder="מספר בית" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="entrance">כניסה:</label>
+          <input type="text" id="entrance" name="entrance" placeholder="כניסה (אופציונלי)">
+        </div>
+        
+        <button type="submit" id="searchBtn">חפש מיקוד</button>
+        <button type="button" id="testBtn" style="display: none; margin-top: 10px; width: 100%; padding: 8px; background: #999; color: white; border: none; border-radius: 4px; cursor: pointer;">🧪 Test Connection</button>
+      </form>
+      
+      <div id="loading" class="loading hidden">
+        <p>מחפש...</p>
+      </div>
+      
+      <div id="results" class="results hidden">
+        <h2>תוצאות:</h2>
+        <div id="resultsContent"></div>
+      </div>
+      
+      <div id="error" class="error hidden">
+        <p id="errorMessage"></p>
+      </div>
+      
+      <div id="history" class="history hidden">
+        <h2>היסטוריית חיפושים:</h2>
+        <div id="historyContent"></div>
+        <button id="clearHistory" class="clear-btn">נקה היסטוריה</button>
+      </div>
+    </main>
+    
+    <footer>
+      <a href="#" id="optionsLink">הגדרות</a>
+      <span id="exportLogsSeparator" style="margin: 0 10px;">|</span>
+      <a href="#" id="exportLogsLink">ייצא לוגים</a>
+    </footer>
+  </div>
+  
+  <script src="utils/logger.js"></script>
+  <script src="utils/storage.js"></script>
+  <script src="utils/validation.js"></script>
+  <script src="utils/api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
+

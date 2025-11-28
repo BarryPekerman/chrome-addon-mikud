@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Mikud - Israeli Zip Code Search",
+  "version": "1.0.0",
+  "description": "Search for Israeli zip codes (מיקוד) directly from your browser using the Israeli Post Office API",
+  "privacy_policy": "https://USERNAME.github.io/chrome-addon-mikud/privacy-policy.html",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.israelpost.co.il/*",
+    "https://services.israelpost.co.il/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  }
+}
+
