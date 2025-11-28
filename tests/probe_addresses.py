@@ -52,9 +52,34 @@ class AddressProber:
         self.valid_addresses = []
     
     def test_address_via_api(self, city, street, house, entrance=""):
-        """Test if an address returns a valid zip code via API"""
+        """Test if an address returns a valid zip code via API - matches extension encoding"""
         try:
-            url = f"{self.api_base_url}?OpenAgent&Location={quote(city)}&POB=&Street={quote(street)}&House={quote(house)}&Entrance={quote(entrance)}"
+            # Custom encoding: encode special chars and Hebrew, but preserve spaces for Street
+            # This matches the extension's buildUrl() function
+            def encode_param(param, preserve_spaces=False):
+                if preserve_spaces:
+                    # For Street: encode everything except spaces (matches JS encodeParam with preserveSpaces=true)
+                    result = []
+                    for char in param:
+                        if char == ' ':
+                            result.append(' ')  # Keep space as literal space
+                        elif char.isalnum():
+                            result.append(char)  # Keep alphanumeric
+                        else:
+                            result.append(quote(char))  # Encode special chars and Hebrew
+                    return ''.join(result)
+                else:
+                    # For other params: encode normally (matches JS encodeURIComponent)
+                    return quote(param)
+            
+            # Build URL with proper encoding - Street uses literal spaces
+            encoded_city = encode_param(city)
+            encoded_street = encode_param(street, preserve_spaces=True)  # Critical: preserve spaces
+            encoded_house = encode_param(house)
+            encoded_entrance = encode_param(entrance)
+            
+            # API requires specific parameter order: House and Entrance before Street
+            url = f"{self.api_base_url}?OpenAgent&Location={encoded_city}&POB=&House={encoded_house}&Entrance={encoded_entrance}&Street={encoded_street}"
             
             response = requests.get(url, timeout=5)
             response.raise_for_status()
@@ -66,6 +91,12 @@ class AddressProber:
                 zip_code = result_text[4:]  # Extract zip code
                 if zip_code.isdigit() and len(zip_code) >= 5:
                     return {'valid': True, 'zipCode': zip_code, 'raw': result_text}
+            
+            # Try regex extraction as fallback
+            import re
+            zip_match = re.search(r'\b\d{5,7}\b', result_text)
+            if zip_match:
+                return {'valid': True, 'zipCode': zip_match.group(), 'raw': result_text}
             
             return {'valid': False, 'raw': result_text}
             

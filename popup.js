@@ -92,8 +92,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Check current tab (optional, wrapped in try-catch since tabs permission may not be available)
         try {
-          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-          console.log('Current tab:', tab?.url);
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        console.log('Current tab:', tab?.url);
         } catch (e) {
           console.log('Tab info not available (tabs permission not granted)');
         }

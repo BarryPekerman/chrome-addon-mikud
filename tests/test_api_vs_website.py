@@ -36,20 +36,39 @@ class ZipCodeTester:
         self.website_url = "https://doar.israelpost.co.il/locatezip"
         
     def search_via_api(self, city, street, house, entrance=""):
-        """Search zip code using the API"""
+        """Search zip code using the API - matches extension's encoding logic"""
         try:
-            params = {
-                'OpenAgent': '',
-                'Location': city,
-                'POB': '',
-                'Street': street,
-                'House': house,
-                'Entrance': entrance
-            }
+            # Custom encoding: encode special chars and Hebrew, but preserve spaces for Street
+            # This matches the extension's buildUrl() function
+            def encode_param(param, preserve_spaces=False):
+                if preserve_spaces:
+                    # For Street: encode everything except spaces (matches JS encodeParam with preserveSpaces=true)
+                    result = []
+                    for char in param:
+                        if char == ' ':
+                            result.append(' ')  # Keep space as literal space
+                        elif char.isalnum():
+                            result.append(char)  # Keep alphanumeric
+                        else:
+                            result.append(quote(char))  # Encode special chars and Hebrew
+                    return ''.join(result)
+                else:
+                    # For other params: encode normally (matches JS encodeURIComponent)
+                    return quote(param)
             
-            url = f"{self.api_base_url}?OpenAgent&Location={quote(city)}&POB=&Street={quote(street)}&House={quote(house)}&Entrance={quote(entrance)}"
+            # Build URL with proper encoding - Street uses literal spaces
+            encoded_city = encode_param(city)
+            encoded_street = encode_param(street, preserve_spaces=True)  # Critical: preserve spaces
+            encoded_house = encode_param(house)
+            encoded_entrance = encode_param(entrance)
+            
+            # API requires specific parameter order: House and Entrance before Street
+            url = f"{self.api_base_url}?OpenAgent&Location={encoded_city}&POB=&House={encoded_house}&Entrance={encoded_entrance}&Street={encoded_street}"
             
             print(f"\n[API] Requesting: {url}")
+            print(f"[API] Note: Street parameter uses literal spaces (not %20)")
+            
+            # Use requests with proper handling
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             
@@ -59,9 +78,16 @@ class ZipCodeTester:
             # Parse RES format: "RES73327233" -> "3327233"
             if result_text.startswith('RES'):
                 zip_code = result_text[4:]  # Skip "RES" and first digit
-                return {'zipCode': zip_code, 'raw': result_text, 'source': 'api'}
-            else:
-                return {'zipCode': result_text, 'raw': result_text, 'source': 'api'}
+                if zip_code.isdigit() and len(zip_code) >= 5:
+                    return {'zipCode': zip_code, 'raw': result_text, 'source': 'api'}
+            
+            # Try to extract zip code from response
+            import re
+            zip_match = re.search(r'\b\d{5,7}\b', result_text)
+            if zip_match:
+                return {'zipCode': zip_match.group(), 'raw': result_text, 'source': 'api'}
+            
+            return {'error': 'No zip code found in response', 'raw': result_text, 'source': 'api'}
                 
         except Exception as e:
             print(f"[API] Error: {e}")
@@ -211,13 +237,16 @@ class ZipCodeTester:
 
 def main():
     """Main test function"""
-    # Test addresses (you can add more)
+    # Test addresses - includes addresses with spaces in street names
     test_cases = [
         {'city': 'חיפה', 'street': 'כנרת', 'house': '7', 'entrance': 'א'},
-        # Add more test cases here
+        {'city': 'תל אביב', 'street': 'דיזנגוף', 'house': '50'},
+        {'city': 'ירושלים', 'street': 'המלך ג\'ורג\'', 'house': '1'},
+        {'city': 'ראש העין', 'street': 'מגדל דוד', 'house': '44'},
+        # Add more test cases with spaces in street names to verify encoding
     ]
     
-    tester = ZipCodeTester(headless=False)  # Set to True for headless mode
+    tester = ZipCodeTester(headless=True)  # Set to False to see browser
     
     results = []
     try:
